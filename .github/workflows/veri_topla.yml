@@ -1,0 +1,36 @@
+name: Hisse Veri Toplama
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Depoyu indir
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Gereken paketleri kur
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Programı çalıştır
+        run: |
+          python veri_cek.py
+
+      - name: CSV dosyasını GitHub'a kaydet
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add hisse_verileri.csv
+          git commit -m "Saatlik veri güncellendi" || echo "Değişiklik yok"
+          git push
